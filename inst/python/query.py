@@ -60,16 +60,30 @@ def query(db, qfields=[]):
         if data != []:
             regex = re.compile(database_descriptor[0].findAll(
                 "prettify")[0].text, re.IGNORECASE)
+            replacBy = database_descriptor[0].findAll(         #important
+                "prettify")[0]['replaceBy']
             for dataLine in data[0].findAll(database_descriptor[0].findAll("data_struct")[0]["line_separator"]):
                 dict = {}
                 i = 0
                 for dataCell in dataLine.findAll(database_descriptor[0].findAll("data_struct")[0]["cell_separator"]):
-                    dataFormat = regex.sub("", dataCell.text)
+                    dataNearly = regex.sub("  ", dataCell.text)
+                    dataFormat = regex.sub("", dataNearly)
                     dict[headers[i]] = dataFormat
                     i += 1
                 if dict == {}:
                     continue
                 result.append(dict)
+            else:
+                for dataLine in data[0].findAll(database_descriptor[0].findAll("data_struct")[0]["line_separator"]):
+                    dict = {}
+                    i = 0
+                    for dataCell in dataLine.findAll(database_descriptor[0].findAll("data_struct")[0]["cell_separator"]):
+                        dataFormat = regex.sub("", dataCell.text)
+                        dict[headers[i]] = dataFormat
+                        i += 1
+                    if dict == {}:
+                        continue
+                    result.append(dict)
         return result
     # Handle JSON based query
     elif(database_descriptor[0]["type"] == "text/JSON"):
